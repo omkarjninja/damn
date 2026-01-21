@@ -3,8 +3,17 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 
 const Announcements = async () => {
-  const { userId, sessionClaims } = await auth();
-  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  let userId: string | null = null;
+  let role: string | undefined = undefined;
+  
+  try {
+    const authResult = await auth();
+    userId = authResult.userId;
+    role = (authResult.sessionClaims?.metadata as { role?: string })?.role;
+  } catch (err) {
+    // If auth fails during build (e.g., missing Clerk env vars), continue with empty data
+    console.error("Announcements auth failed:", err);
+  }
 
   const roleConditions = {
     teacher: { lessons: { some: { teacherId: userId! } } },

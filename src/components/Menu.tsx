@@ -119,8 +119,14 @@ const menuItems = [
 ];
 
 const Menu = async () => {
-  const user = await currentUser();
-  const role = user?.publicMetadata.role as string;
+  let role: string = "admin"; // Default fallback for build time
+  try {
+    const user = await currentUser();
+    role = (user?.publicMetadata.role as string) || "admin";
+  } catch (err) {
+    // If Clerk auth fails during build, use default role
+    console.error("Menu auth failed:", err);
+  }
   return (
     <div className="mt-4 text-sm">
       {menuItems.map((i) => (

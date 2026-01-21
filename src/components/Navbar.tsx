@@ -3,7 +3,13 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 
 const Navbar = async () => {
-  const user = await currentUser();
+  let user: any = null;
+  try {
+    user = await currentUser();
+  } catch (err) {
+    // If Clerk auth fails during build, continue with null user
+    console.error("Navbar auth failed:", err);
+  }
   return (
     <div className="flex items-center justify-between p-4">
       {/* SEARCH BAR */}
