@@ -16,7 +16,7 @@ const SingleTeacherPage = async ({
 }: {
   params: { id: string };
 }) => {
-  const { sessionClaims } = auth();
+  const { sessionClaims } = await auth();
   const role = (sessionClaims?.metadata as { role?: string })?.role;
 
   const teacher:

@@ -17,11 +17,11 @@ const ClassListPage = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
 
-const { sessionClaims } = auth();
-const role = (sessionClaims?.metadata as { role?: string })?.role;
+  const { sessionClaims } = await auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
 
 
-const columns = [
+  const columns = [
   {
     header: "Class Name",
     accessor: "name",
@@ -49,9 +49,9 @@ const columns = [
         },
       ]
     : []),
-];
+  ];
 
-const renderRow = (item: ClassList) => (
+  const renderRow = (item: ClassList) => (
   <tr
     key={item.id}
     className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
@@ -73,7 +73,7 @@ const renderRow = (item: ClassList) => (
       </div>
     </td>
   </tr>
-);
+  );
 
   const { page, ...queryParams } = searchParams;
 

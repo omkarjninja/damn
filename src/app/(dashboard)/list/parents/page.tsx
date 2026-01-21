@@ -18,11 +18,11 @@ const ParentListPage = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
 
-const { sessionClaims } = auth();
-const role = (sessionClaims?.metadata as { role?: string })?.role;
+  const { sessionClaims } = await auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
 
 
-const columns = [
+  const columns = [
   {
     header: "Info",
     accessor: "info",
@@ -50,9 +50,9 @@ const columns = [
         },
       ]
     : []),
-];
+  ];
 
-const renderRow = (item: ParentList) => (
+  const renderRow = (item: ParentList) => (
   <tr
     key={item.id}
     className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
@@ -79,7 +79,7 @@ const renderRow = (item: ParentList) => (
       </div>
     </td>
   </tr>
-);
+  );
 
   const { page, ...queryParams } = searchParams;
 
