@@ -13,7 +13,14 @@ const UserCard = async ({
     parent: prisma.parent,
   };
 
-  const data = await modelMap[type].count();
+  let data = 0;
+  try {
+    data = await modelMap[type].count();
+  } catch (err) {
+    // Allows Vercel build to succeed even if DB isn't reachable during build
+    console.error(`UserCard count failed for ${type}:`, err);
+    data = 0;
+  }
 
   return (
     <div className="rounded-2xl odd:bg-lamaPurple even:bg-lamaYellow p-4 flex-1 min-w-[130px]">

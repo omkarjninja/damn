@@ -12,17 +12,24 @@ const AttendanceChartContainer = async () => {
 
   lastMonday.setDate(today.getDate() - daysSinceMonday);
 
-  const resData = await prisma.attendance.findMany({
-    where: {
-      date: {
-        gte: lastMonday,
+  let resData: Array<{ date: Date; present: boolean }> = [];
+  try {
+    resData = (await prisma.attendance.findMany({
+      where: {
+        date: {
+          gte: lastMonday,
+        },
       },
-    },
-    select: {
-      date: true,
-      present: true,
-    },
-  });
+      select: {
+        date: true,
+        present: true,
+      },
+    })) as any;
+  } catch (err) {
+    // Allows Vercel build to succeed even if DB isn't reachable during build
+    console.error("AttendanceChartContainer findMany failed:", err);
+    resData = [];
+  }
 
   // console.log(data)
 

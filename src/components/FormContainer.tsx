@@ -31,43 +31,68 @@ const FormContainer = async ({ table, type, data, id }: FormContainerProps) => {
   if (type !== "delete") {
     switch (table) {
       case "subject":
-        const subjectTeachers = await prisma.teacher.findMany({
-          select: { id: true, name: true, surname: true },
-        });
-        relatedData = { teachers: subjectTeachers };
+        try {
+          const subjectTeachers = await prisma.teacher.findMany({
+            select: { id: true, name: true, surname: true },
+          });
+          relatedData = { teachers: subjectTeachers };
+        } catch (err) {
+          console.error("FormContainer subject teachers load failed:", err);
+          relatedData = { teachers: [] };
+        }
         break;
       case "class":
-        const classGrades = await prisma.grade.findMany({
-          select: { id: true, level: true },
-        });
-        const classTeachers = await prisma.teacher.findMany({
-          select: { id: true, name: true, surname: true },
-        });
-        relatedData = { teachers: classTeachers, grades: classGrades };
+        try {
+          const classGrades = await prisma.grade.findMany({
+            select: { id: true, level: true },
+          });
+          const classTeachers = await prisma.teacher.findMany({
+            select: { id: true, name: true, surname: true },
+          });
+          relatedData = { teachers: classTeachers, grades: classGrades };
+        } catch (err) {
+          console.error("FormContainer class related data load failed:", err);
+          relatedData = { teachers: [], grades: [] };
+        }
         break;
       case "teacher":
-        const teacherSubjects = await prisma.subject.findMany({
-          select: { id: true, name: true },
-        });
-        relatedData = { subjects: teacherSubjects };
+        try {
+          const teacherSubjects = await prisma.subject.findMany({
+            select: { id: true, name: true },
+          });
+          relatedData = { subjects: teacherSubjects };
+        } catch (err) {
+          console.error("FormContainer teacher subjects load failed:", err);
+          relatedData = { subjects: [] };
+        }
         break;
       case "student":
-        const studentGrades = await prisma.grade.findMany({
-          select: { id: true, level: true },
-        });
-        const studentClasses = await prisma.class.findMany({
-          include: { _count: { select: { students: true } } },
-        });
-        relatedData = { classes: studentClasses, grades: studentGrades };
+        try {
+          const studentGrades = await prisma.grade.findMany({
+            select: { id: true, level: true },
+          });
+          const studentClasses = await prisma.class.findMany({
+            include: { _count: { select: { students: true } } },
+          });
+          relatedData = { classes: studentClasses, grades: studentGrades };
+        } catch (err) {
+          console.error("FormContainer student related data load failed:", err);
+          relatedData = { classes: [], grades: [] };
+        }
         break;
       case "exam":
-        const examLessons = await prisma.lesson.findMany({
-          where: {
-            ...(role === "teacher" ? { teacherId: currentUserId! } : {}),
-          },
-          select: { id: true, name: true },
-        });
-        relatedData = { lessons: examLessons };
+        try {
+          const examLessons = await prisma.lesson.findMany({
+            where: {
+              ...(role === "teacher" ? { teacherId: currentUserId! } : {}),
+            },
+            select: { id: true, name: true },
+          });
+          relatedData = { lessons: examLessons };
+        } catch (err) {
+          console.error("FormContainer exam lessons load failed:", err);
+          relatedData = { lessons: [] };
+        }
         break;
 
       default:

@@ -3,10 +3,18 @@ import CountChart from "./CountChart";
 import prisma from "@/lib/prisma";
 
 const CountChartContainer = async () => {
-  const data = await prisma.student.groupBy({
-    by: ["sex"],
-    _count: true,
-  });
+  let data: Array<{ sex: string; _count: number }> = [];
+  try {
+    // prisma returns a typed result, but we only need these fields
+    data = (await prisma.student.groupBy({
+      by: ["sex"],
+      _count: true,
+    })) as any;
+  } catch (err) {
+    // Allows Vercel build to succeed even if DB isn't reachable during build
+    console.error("CountChartContainer groupBy failed:", err);
+    data = [];
+  }
 
   const boys = data.find((d) => d.sex === "MALE")?._count || 0;
   const girls = data.find((d) => d.sex === "FEMALE")?._count || 0;

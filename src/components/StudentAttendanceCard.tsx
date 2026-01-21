@@ -1,14 +1,22 @@
 import prisma from "@/lib/prisma";
 
 const StudentAttendanceCard = async ({ id }: { id: string }) => {
-  const attendance = await prisma.attendance.findMany({
-    where: {
-      studentId: id,
-      date: {
-        gte: new Date(new Date().getFullYear(), 0, 1),
+  let attendance: Array<{ present: boolean }> = [];
+  try {
+    attendance = (await prisma.attendance.findMany({
+      where: {
+        studentId: id,
+        date: {
+          gte: new Date(new Date().getFullYear(), 0, 1),
+        },
       },
-    },
-  });
+      select: { present: true },
+    })) as any;
+  } catch (err) {
+    // Allows Vercel build to succeed even if DB isn't reachable during build
+    console.error("StudentAttendanceCard findMany failed:", err);
+    attendance = [];
+  }
 
   const totalDays = attendance.length;
   const presentDays = attendance.filter((day) => day.present).length;

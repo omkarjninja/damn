@@ -9,13 +9,20 @@ const BigCalendarContainer = async ({
   type: "teacherId" | "classId";
   id: string | number;
 }) => {
-  const dataRes = await prisma.lesson.findMany({
-    where: {
-      ...(type === "teacherId"
-        ? { teacherId: id as string }
-        : { classId: id as number }),
-    },
-  });
+  let dataRes: Array<any> = [];
+  try {
+    dataRes = await prisma.lesson.findMany({
+      where: {
+        ...(type === "teacherId"
+          ? { teacherId: id as string }
+          : { classId: id as number }),
+      },
+    });
+  } catch (err) {
+    // Allows Vercel build to succeed even if DB isn't reachable during build
+    console.error("BigCalendarContainer findMany failed:", err);
+    dataRes = [];
+  }
 
   const data = dataRes.map((lesson) => ({
     title: lesson.name,

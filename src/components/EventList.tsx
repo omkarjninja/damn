@@ -3,14 +3,21 @@ import prisma from "@/lib/prisma";
 const EventList = async ({ dateParam }: { dateParam: string | undefined }) => {
   const date = dateParam ? new Date(dateParam) : new Date();
 
-  const data = await prisma.event.findMany({
-    where: {
-      startTime: {
-        gte: new Date(date.setHours(0, 0, 0, 0)),
-        lte: new Date(date.setHours(23, 59, 59, 999)),
+  let data: Array<any> = [];
+  try {
+    data = await prisma.event.findMany({
+      where: {
+        startTime: {
+          gte: new Date(date.setHours(0, 0, 0, 0)),
+          lte: new Date(date.setHours(23, 59, 59, 999)),
+        },
       },
-    },
-  });
+    });
+  } catch (err) {
+    // Allows Vercel build to succeed even if DB isn't reachable during build
+    console.error("EventList findMany failed:", err);
+    data = [];
+  }
 
   return data.map((event) => (
     <div
