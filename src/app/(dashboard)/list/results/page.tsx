@@ -29,12 +29,12 @@ const ResultListPage = async ({
   searchParams: { [key: string]: string | undefined };
 }) => {
 
-const { userId, sessionClaims } = auth();
-const role = (sessionClaims?.metadata as { role?: string })?.role;
-const currentUserId = userId;
+  const { userId, sessionClaims } = await auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  const currentUserId = userId;
 
 
-const columns = [
+  const columns = [
   {
     header: "Title",
     accessor: "title",
@@ -71,9 +71,9 @@ const columns = [
         },
       ]
     : []),
-];
+  ];
 
-const renderRow = (item: ResultList) => (
+  const renderRow = (item: ResultList) => (
   <tr
     key={item.id}
     className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-lamaPurpleLight"
@@ -99,7 +99,7 @@ const renderRow = (item: ResultList) => (
       </div>
     </td>
   </tr>
-);
+  );
 
   const { page, ...queryParams } = searchParams;
 
