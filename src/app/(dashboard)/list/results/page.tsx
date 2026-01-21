@@ -186,7 +186,7 @@ const ResultListPage = async ({
     prisma.result.count({ where: query }),
   ]);
 
-  const data = dataRes.map((item) => {
+  const data = dataRes.map((item: any) => {
     const assessment = item.exam || item.assignment;
 
     if (!assessment) return null;
