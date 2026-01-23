@@ -1,24 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 
 /**
- * Vercel/Next builds may evaluate server components during `next build` (collect page data).
- * If DATABASE_URL isn't set (or Prisma can't initialize), importing prisma must not hard-crash
- * the build. We return a "safe" empty object in that case; callers that actually query should
- * already be wrapped in try/catch and can fall back gracefully.
+ * PrismaClient can be instantiated even without DATABASE_URL - it just won't connect.
+ * During build, Next.js may try to execute server components, but all our Prisma queries
+ * are wrapped in try/catch blocks, so connection errors are handled gracefully.
  */
 const prismaClientSingleton = () => {
-  if (!process.env.DATABASE_URL) {
-    // Keep builds alive even if DB isn't configured in build environment.
-    console.warn("Prisma: DATABASE_URL is not set. Returning a disabled prisma client.");
-    return {} as unknown as PrismaClient;
-  }
-
-  try {
-    return new PrismaClient();
-  } catch (err) {
-    console.error("Prisma: failed to initialize PrismaClient. Returning disabled client.", err);
-    return {} as unknown as PrismaClient;
-  }
+  // Always return a real PrismaClient instance.
+  // If DATABASE_URL is missing, Prisma will throw when you try to query,
+  // but that's fine because all our queries are wrapped in try/catch.
+  return new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+  });
 };
 
 declare const globalThis: {
