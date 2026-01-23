@@ -204,7 +204,7 @@ const ResultListPage = async ({
       className: assessment.lesson.class.name,
       startTime: isExam ? assessment.startTime : assessment.startDate,
     };
-  });
+  }).filter(Boolean);;
 
   return (
     <div className="bg-white p-4 rounded-md flex-1 m-4 mt-0">
